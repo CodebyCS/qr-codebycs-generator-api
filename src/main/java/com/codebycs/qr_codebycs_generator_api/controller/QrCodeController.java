@@ -8,14 +8,25 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.codebycs.qr_codebycs_generator_api.dto.qrcode.QrCodeGenerateRequest;
 import com.codebycs.qr_codebycs_generator_api.dto.qrcode.QrCodeGenerateResponse;
+import com.codebycs.qr_codebycs_generator_api.service.QrCodeGeneratorService;
 
 @RestController
 @RequestMapping("/qrcode")
 public class QrCodeController {
 
-    @PostMapping
-    public ResponseEntity<QrCodeGenerateResponse> generate(@RequestBody QrCodeGenerateRequest request){
-        return null;
+    private final QrCodeGeneratorService qrCodeGeneratorService;
+
+    public QrCodeController(QrCodeGeneratorService qrCodeGeneratorService) {
+        this.qrCodeGeneratorService = qrCodeGeneratorService;
     }
 
+    @PostMapping
+    public ResponseEntity<QrCodeGenerateResponse> generate(@RequestBody QrCodeGenerateRequest request){
+        try {
+            QrCodeGenerateResponse response = this.qrCodeGeneratorService.generateAndUploadQrCode(request.url());
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().build();
+        }
+    }
 }
